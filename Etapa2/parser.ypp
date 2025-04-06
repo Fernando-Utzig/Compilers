@@ -1,0 +1,164 @@
+/* Fernando Vieira Utzig - 00324861 */
+%{
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include "symbols.hpp"
+
+using namespace std;
+
+extern int yylex();
+extern char* yytext;
+void yyerror(const char *s);
+extern SYMBOL *symbolInsert(int type, const char *text);
+extern int getLineNumber();; // Import lineNumber
+
+%}
+
+/* Define the tokens */
+%token KW_BYTE
+%token KW_INT
+%token KW_REAL
+%token KW_IF
+%token KW_ELSE
+%token KW_DO
+%token KW_WHILE
+%token KW_READ
+%token KW_PRINT
+%token KW_RETURN
+%token OPERATOR_LE
+%token OPERATOR_GE
+%token OPERATOR_EQ
+%token OPERATOR_DIF
+%token TK_IDENTIFIER
+%token LIT_INT
+%token LIT_CHAR
+%token LIT_REAL
+%token LIT_STRING
+%token TOKEN_ERROR
+
+%left '+' '-'
+%left '*' '/'
+%left '<' '>' OPERATOR_LE OPERATOR_GE 
+%left '&' '|'
+%left '~'
+%left OPERATOR_EQ OPERATOR_DIF '='
+
+
+%%
+
+program: ldef
+    ;
+
+ldef:
+    def ldef
+    | /* empty */
+    ;
+
+def:
+    var_declaration
+    | func_declaration
+    | vec_declaration
+    ;
+
+var_declaration:
+    type TK_IDENTIFIER '=' expression ';'
+    ;
+
+vec_declaration:
+    type TK_IDENTIFIER '[' LIT_INT ']' ';'
+    | type TK_IDENTIFIER '[' LIT_INT ']' '=' init_list ';'
+    ;
+
+init_list:
+    vec_val_list
+    | vec_val_list ',' init_list
+    ;
+
+vec_val_list:
+    LIT_INT
+    | LIT_REAL
+    | LIT_CHAR
+    ;
+
+func_declaration:
+    type TK_IDENTIFIER '(' parameter_list ')' '{' command_list '}'
+    ;
+
+parameter_list:
+    parameters
+    | /* empty */
+    ;
+
+parameters:
+    type TK_IDENTIFIER
+    | parameters ',' type TK_IDENTIFIER
+    ;
+
+command_list:
+    command_list command
+    | /* empty */
+    ;
+
+command:
+    TK_IDENTIFIER '=' expression ';'
+    | TK_IDENTIFIER '[' expression ']' '=' expression ';'
+    | '{' command_list '}'
+    | KW_READ TK_IDENTIFIER ';'
+    | KW_PRINT print_list
+    | KW_RETURN expression ';'
+    | KW_IF '(' expression ')' command
+    | KW_IF '(' expression ')' command KW_ELSE command
+    | KW_WHILE expression KW_DO command
+    | KW_DO command KW_WHILE expression ';'
+    | ';'
+    ;
+
+print_list:
+    expression ';'
+    | LIT_STRING ';'
+    | expression print_list 
+    | LIT_STRING print_list
+    ;
+
+type:
+    KW_BYTE
+    | KW_INT
+    | KW_REAL
+    ;
+
+expression:
+    | TK_IDENTIFIER
+    | TK_IDENTIFIER '[' expression ']'
+    | '(' expression ')'
+    | TK_IDENTIFIER '(' arguments ')'
+    | LIT_INT
+    | LIT_CHAR
+    | LIT_REAL
+    | expression '+' expression
+    | expression '-' expression
+    | expression '*' expression
+    | expression '/' expression
+    | expression '<' expression
+    | expression '>' expression
+    | expression '&' expression
+    | expression '|' expression
+    | expression OPERATOR_LE expression
+    | expression OPERATOR_GE expression
+    | expression '=' expression
+    | expression OPERATOR_EQ expression
+    | expression OPERATOR_DIF expression
+    | '~' expression
+    ;
+
+arguments:
+    expression
+    | expression ',' arguments
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Syntax error: %s at line %d near '%s'\n", s, getLineNumber(), yytext);
+    exit(3);
+}
