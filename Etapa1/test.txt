@@ -1,0 +1,49 @@
+// Este eh um comentario de linha unica
+int main() {
+    /--
+      Este eh um comentario
+      de multiplas linhas.
+     --/
+     .
+    byte a = 123;
+    real b = 456/789;
+    real c = 5/7;
+    char c = 'x';
+    string d = "Esta eh uma string com \"aspas duplas\" e uma \\nnova linha";
+
+    if (a <= 10) {
+        print "a eh menor ou igual a 10";
+    } else {
+        print "a eh maior que 10";
+    }
+
+    do {
+        read a;
+        a = a + 1;
+    } while (a != 150);
+
+    while (b >= 0.5) {
+        b = b - 0.1;
+    }
+
+    // Teste de operadores
+    a = a * 2;
+    b = b / 3;
+    a = a % 5;
+    a = a + b;
+    a = a - b;
+
+    // Teste de comparação
+    if (a == b) {
+        print "a eh igual a b";
+    }
+
+    if (a != b) {
+        print "a eh diferente de b";
+    }
+
+    return 00123; // Literal inteiro com zeros à esquerda (deve ser invertido)
+}
+
+// Erro léxico (caractere inválido)
+@
